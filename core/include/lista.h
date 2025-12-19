@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef struct ListaNo{
     int valor;
@@ -123,6 +124,6 @@ int lista_vazia(Lista* lista);
  * @return String JSON alocada dinamicamente,
  *         cuja liberação é responsabilidade do chamador.
  */
-char* lista_para_json(Lista* lista, int modo_real);
+char* lista_para_json(Lista* lista);
 
 #endif

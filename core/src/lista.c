@@ -133,5 +133,36 @@ int lista_vazia(Lista* lista){
 }
 
 char* lista_para_json(Lista* lista){
-    
+    if(lista == NULL) return NULL;
+
+    //tamanho da string
+    size_t tamanho = 128;
+    char* json = malloc(tamanho);
+    if(json == NULL) return NULL;
+
+    //abre vetor
+    strcpy(json, "[");
+    ListaNo* atual = lista->inicio;
+    int primeiro = 1;
+    while(atual){
+        //espaço necessário
+        char buffer[64];
+        snprintf(buffer, sizeof(buffer), "%s{\"valor\":%d}", primeiro ? "" : ",", atual->valor);
+
+        //realoca se precisar
+        if(strlen(json) + strlen(buffer) + 2 > tamanho){
+            tamanho *= 2;
+            json = realloc(json, tamanho);
+            if(json == NULL) return NULL;
+        }
+
+        //concatena com os dados do buffer
+        strcat(json, buffer);
+        primeiro = 0;
+        atual = atual->prox;
+    }
+
+    //concatena fechando
+    strcat(json, "]");
+    return json;
 }
