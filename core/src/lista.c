@@ -136,7 +136,7 @@ char* lista_para_json(Lista* lista){
     if(lista == NULL) return NULL;
 
     //tamanho da string
-    size_t tamanho = 128;
+    size_t tamanho = lista->tam ? lista->tam * 32 : 32;
     char* json = malloc(tamanho);
     if(json == NULL) return NULL;
 
@@ -152,8 +152,12 @@ char* lista_para_json(Lista* lista){
         //realoca se precisar
         if(strlen(json) + strlen(buffer) + 2 > tamanho){
             tamanho *= 2;
-            json = realloc(json, tamanho);
-            if(json == NULL) return NULL;
+            char* tmp = realloc(json, tamanho);
+            if(tmp == NULL){
+                free(json);
+                return NULL;
+            }
+            json = tmp;
         }
 
         //concatena com os dados do buffer
