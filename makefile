@@ -1,37 +1,38 @@
-# Makefile básico para projeto de estruturas de dados
+TARGET = app
+IMAGE  = visualizador-estruturas
+
+# Fonte C e objetos
+SRC = core/src/main.c core/src/lista.c core/src/pilha.c
+OBJ = $(SRC:.c=.o)
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude -g
-LDFLAGS = 
+CFLAGS = -Wall -Wextra -Icore/include -g
 
-SRC_DIR = src
-INCLUDE_DIR = include
-BUILD_DIR = build
+.PHONY: all clean docker run run_docker
 
-SRC = $(SRC_DIR)/main.c $(SRC_DIR)/lista.c $(SRC_DIR)/pilha.c
-OBJ = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC))
+# --- Alvo padrão ---
+all: $(TARGET)
 
-TARGET = app
+# --- Compila executável ---
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $(TARGET)
 
-# Cria a pasta build se não existir
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-# Regra principal
-all: $(BUILD_DIR) $(TARGET)
-
-# Compila objetos
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+# --- Compila arquivos .o ---
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Linka objetos
-$(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-# Limpar arquivos compilados
+# --- Limpar build ---
 clean:
-	rm -rf $(BUILD_DIR) $(TARGET)
+	rm -f $(OBJ) $(TARGET)
 
-# Executar programa
-run: $(TARGET)
+# --- Criar imagem Docker ---
+docker:
+	docker build -t $(IMAGE) .
+
+# --- Executar app local ---
+run:
 	./$(TARGET)
+
+# --- Executar app dentro do container ---
+run_docker:
+	docker run --rm -it $(IMAGE)
