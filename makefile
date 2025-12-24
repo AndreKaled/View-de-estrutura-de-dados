@@ -1,38 +1,36 @@
-TARGET = app
-IMAGE  = visualizador-estruturas
-DEV_IMAGE = visualizador-dev
+# --- Configurações ---
+CC       = gcc
+CFLAGS   = -Wall -Wextra -Icore/include -g
+SRC_CORE = core/src/lista.c core/src/pilha.c core/src/visual_json.c
 
-# Fonte C e objetos
-SRC = core/src/main.c core/src/lista.c core/src/pilha.c core/src/visual_json.c
-OBJ = $(SRC:.c=.o)
+IMAGE      = visualizador-estruturas
+DEV_IMAGE  = visualizador-dev
 
-CC = gcc
-CFLAGS = -Wall -Wextra -Icore/include -g
+# --- Detecta automaticamente todos os mains ---
+MAINS     := $(wildcard core/src/main_*.c)
+TARGETS   := $(patsubst core/src/main_%.c,app_%,$(MAINS))
 
 .PHONY: all clean docker run run_docker dev_image dev_docker shell_docker
 
-# --- Alvo padrão ---
-all: $(TARGET)
+# --- Alvo padrão: compila todos os mains ---
+all: $(TARGETS)
 
-# --- Compila executável ---
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $(TARGET)
-
-# --- Compila arquivos .o ---
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# --- Regra genérica para compilar cada main ---
+# main_lista.c -> app_lista
+$(TARGETS): app_%: core/src/main_%.c $(SRC_CORE)
+	$(CC) $(CFLAGS) $^ -o $@
 
 # --- Limpar build ---
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(TARGETS) *.o
 
 # --- Build da imagem FINAL (prod) ---
 docker:
 	docker build -t $(IMAGE) .
 
-# --- Executar app local ---
-run:
-	./$(TARGET)
+# --- Executar app local (por padrão pega o primeiro main detectado) ---
+run: all
+	./$(firstword $(TARGETS))
 
 # --- Executar app da imagem FINAL ---
 run_docker:
@@ -42,13 +40,13 @@ run_docker:
 dev_image:
 	docker build -f dockerfile.dev -t $(DEV_IMAGE) .
 
-# --- Rodar container de DEV com bind mount ---
+# --- Rodar container de DEV com bind mount e executar um main específico ---
 dev_docker: dev_image
 	docker run --rm -it \
 		-v $(PWD):/app \
 		-w /app \
 		$(DEV_IMAGE) \
-		bash -c "make all && ./$(TARGET)"
+		bash -c "make all && ./$(firstword $(TARGETS))"
 
 # --- Abrir shell no container de DEV ---
 shell_docker: dev_image
@@ -57,3 +55,10 @@ shell_docker: dev_image
 		-w /app \
 		$(DEV_IMAGE) \
 		/bin/bash
+
+run_api_docker:
+	docker run --rm -it \
+		-v $(PWD):/app \
+		-w /app \
+		$(DEV_IMAGE) \
+		python3 api/app.py
