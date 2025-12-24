@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "visual.h"
 
 typedef struct ListaNo{
     int valor;
@@ -115,15 +116,24 @@ int tamanho_lista(Lista* lista);
 int lista_vazia(Lista* lista);
 
 /**
- * Gera uma representação da lista encadeada em formato JSON.
+ * Visualiza os elementos da lista utilizando uma estratégia de visualização.
  *
- * O JSON contém os nós e suas ligações
+ * Percorre a lista do início ao fim e delega a forma de exibição
+ * ao objeto Visual fornecido. A função não imprime diretamente,
+ * apenas chama os callbacks definidos em Visual.
  *
- * @param lista Ponteiro para a lista.
+ * A ordem de chamada é:
+ *  - begin(v), se definido
+ *  - elemento(v, valor) para cada nó da lista, se definido
+ *  - end(v), se definido
  *
- * @return String JSON alocada dinamicamente,
- *         cuja liberação é responsabilidade do chamador.
+ * @param lista Ponteiro para a lista a ser visualizada.
+ * @param v Ponteiro para a estrutura Visual responsável pela saída.
+ *
+ * Se lista ou v forem NULL, a função não realiza nenhuma ação.
+ *
+ * A função não altera a lista nem o estado interno dos nós.
  */
-char* lista_para_json(Lista* lista);
+void lista_visualizar(Lista* lista, Visual* v);
 
 #endif

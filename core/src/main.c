@@ -1,43 +1,30 @@
 #include <stdio.h>
 #include "lista.h"
 #include "pilha.h"
+#include "visual.h"
+#include "visual_json.h"
 
 int main(){
-    /**
-    Lista* l = criar_lista();
-    inserir_inicio(l, 1);
-    inserir_fim(l, 2);
-    inserir_inicio(l, 3);
-
-    char* json = lista_para_json(l);
-    if(json){
-        printf("%s\n", json);
-        free(json);
-    }
-
-    destruir_lista(l);
-    */
-
     Pilha* p = criar_pilha();
     empilhar(p,1);
     empilhar(p,2);
     empilhar(p,3);
-    char* json = pilha_para_json(p);
-    if(json){
-        printf("%s\n", json);
-        free(json);
-    }
-    int val;
-    desempilhar(p, &val);
-    printf("Desempilhando: %d\n", val);
+    empilhar(p,4);
 
-    json = pilha_para_json(p);
-    if(json){
-        printf("%s\n", json);
-        free(json);
-    }
+    Visual v = visual_json();
+    pilha_visualizar(p, &v);
 
     destruir_pilha(p);
+
+    // lista
+    Lista* l = criar_lista();
+    inserir_fim(l, 2);
+    inserir_inicio(l, 1);
+    inserir_fim(l, 3);
+    inserir_fim(l, 4);
+    lista_visualizar(l, &v);
+
+    destruir_lista(l);
 
     return 0;
 }

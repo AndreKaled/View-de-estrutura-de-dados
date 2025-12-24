@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "visual.h"
 
 typedef struct PilhaNo{
     int valor;
@@ -81,12 +82,26 @@ int pilha_vazia(Pilha* pilha);
 int tamanho_pilha(Pilha* pilha);
 
 /**
- * Gera uma representação da pilha em formato JSON.
+ * Percorre a pilha do topo até a base e envia seus elementos
+ * para um visualizador genérico.
  *
- * @param pilha Ponteiro para a pilha.
+ * Esta função não sabe como os dados serão exibidos.
+ * Ela apenas percorre a pilha e chama os callbacks definidos em `Visual`.
  *
- * @return String JSON alocada dinamicamente.
- *         Responsabilidade do chamador liberar a memória.
+ * Ordem de chamadas:
+ *  1. v->begin(v)      (se existir)
+ *  2. v->elemento(v, valor) para cada elemento da pilha
+ *  3. v->end(v)        (se existir)
+ *
+ * A pilha é percorrida do topo para o fundo.
+ *
+ * @param pilha Ponteiro para a pilha a ser visualizada.
+ * @param v     Ponteiro para um visualizador que implementa o contrato Visual.
+ *
+ * @note
+ * - Se `pilha` ou `v` for NULL, a função não faz nada.
+ * - Nenhuma alocação ou liberação de memória é realizada aqui.
+ * - O formato da saída é responsabilidade exclusiva do visualizador.
  */
-char* pilha_para_json(Pilha* pilha);
+void pilha_visualizar(Pilha* pilha, Visual* v);
 #endif

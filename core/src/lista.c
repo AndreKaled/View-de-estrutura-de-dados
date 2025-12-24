@@ -132,41 +132,15 @@ int lista_vazia(Lista* lista){
     return lista->tam == 0 ? 1 : 0;
 }
 
-char* lista_para_json(Lista* lista){
-    if(lista == NULL) return NULL;
+void lista_visualizar(Lista* lista, Visual* v){
+    if(lista == NULL || v == NULL) return;
 
-    //tamanho da string
-    size_t tamanho = lista->tam ? lista->tam * 32 : 32;
-    char* json = malloc(tamanho);
-    if(json == NULL) return NULL;
+    if(v->begin) v->begin(v);
 
-    //abre vetor
-    strcpy(json, "[");
-    ListaNo* atual = lista->inicio;
-    int primeiro = 1;
-    while(atual){
-        //espaço necessário
-        char buffer[64];
-        snprintf(buffer, sizeof(buffer), "%s{\"valor\":%d}", primeiro ? "" : ",", atual->valor);
-
-        //realoca se precisar
-        if(strlen(json) + strlen(buffer) + 2 > tamanho){
-            tamanho *= 2;
-            char* tmp = realloc(json, tamanho);
-            if(tmp == NULL){
-                free(json);
-                return NULL;
-            }
-            json = tmp;
-        }
-
-        //concatena com os dados do buffer
-        strcat(json, buffer);
-        primeiro = 0;
-        atual = atual->prox;
+    for(ListaNo* n = lista->inicio; n; n = n->prox){
+        if(v->elemento)
+            v->elemento(v, n->valor);
     }
 
-    //concatena fechando
-    strcat(json, "]");
-    return json;
+    if(v->end) v->end(v);
 }

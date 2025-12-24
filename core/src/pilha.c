@@ -75,41 +75,15 @@ int tamanho_pilha(Pilha* pilha){
     return pilha->tam;
 }
 
-char* pilha_para_json(Pilha* pilha){
-    if(pilha == NULL) return NULL;
+void pilha_visualizar(Pilha* pilha, Visual* v){
+    if(pilha == NULL || v == NULL) return;
 
-    //tamanho da string
-    size_t tamanho = pilha->tam ? pilha->tam * 32 : 32;
-    char* json = malloc(tamanho);
-    if(json == NULL) return NULL;
+    if(v->begin) v->begin(v);
 
-    //abre vetor
-    strcpy(json, "[");
-    PilhaNo* atual = pilha->topo;
-    int primeiro = 1;
-    while(atual){
-        //espaço necessário
-        char buffer[64];
-        snprintf(buffer, sizeof(buffer), "%s{\"valor\":%d}", primeiro ? "" : ",", atual->valor);
-
-        //realoca se precisar
-        if(strlen(json) + strlen(buffer) + 2 > tamanho){
-            tamanho *= 2;
-            char* tmp = realloc(json, tamanho);
-            if(tmp == NULL){
-                free(json);
-                return NULL;
-            }
-            json = tmp;
-        }
-
-        //concatena com os dados do buffer
-        strcat(json, buffer);
-        primeiro = 0;
-        atual = atual->prox;
+    for(PilhaNo* n = pilha->topo; n; n = n->prox){
+        if(v->elemento)
+            v->elemento(v, n->valor);
     }
 
-    //concatena fechando
-    strcat(json, "]");
-    return json;
+    if(v->end) v->end(v);
 }
