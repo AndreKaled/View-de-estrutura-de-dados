@@ -11,6 +11,5 @@ def executar_pilha(args):
 # iInserir valores via API e vê o resultado
 dados = executar_lista(['10', '20', '30'])
 print("Lista:" +str(dados))
-dados = executar_pilha(['10', '20', '30'])
+dados = executar_pilha(['10', '20', '30', '40'])
 print("Pilha: " +str(dados))
-
